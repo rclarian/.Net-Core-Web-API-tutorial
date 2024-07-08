@@ -63,6 +63,11 @@ namespace Web_API_Demo.Controllers
                 return BadRequest();
             }
 
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var newItem = new ToDoItem
             { 
                 Title = newItemDTO.Title,
