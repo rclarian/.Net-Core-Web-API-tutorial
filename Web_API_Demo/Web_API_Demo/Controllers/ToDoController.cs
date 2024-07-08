@@ -6,7 +6,7 @@ using Web_API_Demo.DTO;
 
 namespace Web_API_Demo.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class ToDoController : ControllerBase
     {
@@ -53,6 +53,30 @@ namespace Web_API_Demo.Controllers
             var toDoItemDTO = MapToDoItemToDTO(toDoItem);
             return Ok(toDoItemDTO);
 
+        }
+
+        [HttpPost]
+        public IActionResult CreateToDoItem([FromBody] ToDoItemDTO newItemDTO)
+        {
+            if (newItemDTO == null) 
+            { 
+                return BadRequest();
+            }
+
+            var newItem = new ToDoItem
+            { 
+                Title = newItemDTO.Title,
+                IsCompleted = newItemDTO.IsCompleted
+            };
+
+            //Generate a new ID for the to-do item
+            int newId = _toDoItems.Max(item => item.Id) + 1;
+            newItem.Id = newId;
+
+            _toDoItems.Add(newItem);
+
+            //Return the newly created to-do item along with a 201 created status code
+            return CreatedAtAction(nameof(GetToDoItembyId), new { id = newItem.Id }, newItem);
         }
 
         private ToDoItemDTO MapToDoItemToDTO(ToDoItem item)
